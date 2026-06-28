@@ -1,0 +1,23 @@
+from pydantic import BaseModel,Field
+from database.models import ShipmentStatus
+from datetime import datetime
+from uuid import UUID
+from database.models import Seller
+
+class BaseShipment(BaseModel):
+    weight: float = Field(ge=1, le=25, description="Weight of the shipment in kg")
+    content: str = Field(max_length=100, description="Description of the shipment content")
+    destination: int
+    
+class ShipmentRead(BaseShipment):
+    id: UUID
+    seller: Seller
+    status: ShipmentStatus
+    estimated_delivery: datetime
+    
+class ShipmentCreate(BaseShipment):
+    pass
+
+class ShipmentUpdate(BaseModel):
+    status:ShipmentStatus | None = Field(default=None)
+    estimated_delivery: datetime | None =Field(default=None)

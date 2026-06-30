@@ -36,10 +36,7 @@ class ShipmentService(BaseService):
         return await self._add(new_shipment)
     
     
-    async def update(self,id:int,shipment_update: dict)->Shipment:
-        shipment=await self.session.get(Shipment,id)
-        shipment.sqlmodel_update(shipment_update)
-        
+    async def update(self,shipment: Shipment)->Shipment:
         return await self._update(shipment)
     
     

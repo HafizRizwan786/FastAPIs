@@ -43,8 +43,20 @@ async def patch_shipment(
             detail="Not update is provided"
         )
     
-    shipment=await service.update(id,update)
-    return shipment
+    # Validate logged in parter with assigned partner
+    # on the shipment with given id
+    shipment = await service.get(id)
+
+    if shipment.delivery_partner_id != partner.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorized",
+        )
+
+    return await service.update(
+        shipment.sqlmodel_update(update),
+    )
+
 
 
 

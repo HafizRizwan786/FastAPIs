@@ -22,7 +22,7 @@ class DeliveryPartnerService(UserService):
         return (
             await self.session.scalars(
                 select(DeliveryPartner).where(
-                    zipcode == any_(DeliveryPartner.serviceable_zip_codes)
+                    zipcode == any_(DeliveryPartner.serviceable_zip_code)
                 )
             )
         ).all()

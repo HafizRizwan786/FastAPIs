@@ -29,7 +29,7 @@ class UserService(BaseService):
         
     
     async def _generate_token(self,email,password)->str:
-        user=self._get_by_email(email)
+        user=await self._get_by_email(email)
         
         if user is None or not password_context.verify(password,user.password_hash):
             raise HTTPException(

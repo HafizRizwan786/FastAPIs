@@ -13,7 +13,7 @@ class BaseService():
     async def _add(self,entity: SQLModel):
         self.session.add(entity)
         await self.session.commit()
-        await self.session.refresh()
+        await self.session.refresh(entity)
         return entity
     
     async def _update(self,entity: SQLModel):

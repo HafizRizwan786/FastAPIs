@@ -11,6 +11,8 @@ class ShipmentStatus(str,Enum):
     in_transit = "in_transit"
     delivered = "delivered"
     out_for_delivery = "out_for_delivery"
+    cancelled = "cancelled"
+
     
 
 class Shipment(SQLModel,table=True):
@@ -54,6 +56,11 @@ class Shipment(SQLModel,table=True):
         sa_relationship_kwargs={
         "lazy":"selectin"
     })
+    
+    
+    @property
+    def status(self):
+        return self.timeline[-1].status if len(self.timeline)>0 else None
 
 
 
@@ -159,6 +166,7 @@ class DeliveryPartner(User,table=True):
             shipment
             for shipment in self.shipments
             if shipment.status != ShipmentStatus.delivered
+            and shipment.status != ShipmentStatus.cancelled
         ]
     
     @property

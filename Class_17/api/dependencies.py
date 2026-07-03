@@ -1,3 +1,4 @@
+from services.shipment_event import ShipmentEventService
 from services.shipment import ShipmentService
 from services.delivery_partner import DeliveryPartnerService
 from services.seller import SellerService
@@ -87,7 +88,8 @@ async def get_current_partner(
 def get_shipment_server(session: SessionDep):
     return ShipmentService(
         session,
-        DeliveryPartnerService(session)
+        DeliveryPartnerService(session),
+        ShipmentEventService(session)
     )
 
 

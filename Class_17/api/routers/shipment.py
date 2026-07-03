@@ -43,25 +43,19 @@ async def patch_shipment(
             detail="Not update is provided"
         )
     
-    # Validate logged in parter with assigned partner
-    # on the shipment with given id
-    shipment = await service.get(id)
+    
 
-    if shipment.delivery_partner_id != partner.id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized",
-        )
-
-    return await service.update(
-        shipment.sqlmodel_update(update),
-    )
+    return await service.update(id,shipment_update,partner)
 
 
 
 
-# Delete Shipment
-@router.delete('/')
-async def del_shipment(id: UUID,service: ShipmentServiceDep) ->dict[str,str]:
-    await service.delete(id)
-    return {"Detail": f"Shipment with id #{id} have been deleted!"}
+# Cancel Shipment
+@router.get('/cancel')
+async def cancel_shipment(
+    id: UUID,
+    seller: SellerDep,
+    service: ShipmentServiceDep):
+    
+    return await service.cancel(id,seller)
+    

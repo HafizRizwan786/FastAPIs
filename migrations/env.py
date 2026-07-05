@@ -6,9 +6,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from Class_18.config import db_settings
+from Class_19.config import db_settings
 from sqlmodel import SQLModel
-from Class_18.database.models import Shipment,Seller,DeliveryPartner
+from Class_19.database.models import Shipment,Seller,DeliveryPartner
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

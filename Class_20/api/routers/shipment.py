@@ -1,0 +1,85 @@
+from utils import TEMPLATE_DIR
+from fastapi import APIRouter,HTTPException,status,Request
+# from fastapi.responses import HTMLResponse
+from api.schemas.shipment import ShipmentRead,ShipmentUpdate,ShipmentCreate
+from api.dependencies import ShipmentServiceDep,SellerDep,DeliveryPartnerDep
+from database.models import Shipment
+from uuid import UUID
+from fastapi.templating import Jinja2Templates
+
+
+templates = Jinja2Templates(TEMPLATE_DIR)
+
+router=APIRouter(prefix='/shipment',tags=['Shipment'])
+
+# Get Method
+@router.get('/',response_model=ShipmentRead)
+async def get_shipment(id: UUID,service: ShipmentServiceDep):
+    shipment=await service.get(id)
+    if shipment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Given id does not exist'
+        )
+    return shipment
+
+
+# Track shipment
+@router.get('/track')
+async def get_tracking(request: Request,id: UUID,service: ShipmentServiceDep):
+    shipment=await service.get(id)
+    
+    context=shipment.model_dump()
+    context["status"]=shipment.status
+    context["parnter"]=shipment.delivery_partner.name
+    context["timeline"]=shipment.timeline
+    context["timeline"].reverse()
+    
+    return templates.TemplateResponse(
+        request=request,
+        name='track.html',
+        context=context
+    )
+
+
+# Post Method
+@router.post('/')
+async def submit_shipment(
+        seller: SellerDep,
+        shipment: ShipmentCreate,
+        service: ShipmentServiceDep
+    )-> Shipment:
+    return await service.add(shipment,seller)
+
+
+# Update Shipment Status
+@router.patch('/',response_model=ShipmentRead)
+async def patch_shipment(
+    id: UUID,
+    shipment_update: ShipmentUpdate,
+    partner: DeliveryPartnerDep,
+    service: ShipmentServiceDep,
+    ):
+    update=shipment_update.model_dump(exclude_none=True)
+    if not update:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Not update is provided"
+        )
+    
+    
+
+    return await service.update(id,shipment_update,partner)
+
+
+
+
+# Cancel Shipment
+@router.get('/cancel')
+async def cancel_shipment(
+    id: UUID,
+    seller: SellerDep,
+    service: ShipmentServiceDep):
+    
+    return await service.cancel(id,seller)
+    

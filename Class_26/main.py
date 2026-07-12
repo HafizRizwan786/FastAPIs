@@ -1,0 +1,27 @@
+from contextlib import asynccontextmanager
+from Class_26.core.exceptions import add_exception_handlers
+from fastapi import  FastAPI
+from scalar_fastapi import get_scalar_api_reference
+from Class_26.database.session import create_db_tables
+from Class_26.api.router import master_router
+
+
+@asynccontextmanager
+async def life_span_handler(app: FastAPI):
+    await create_db_tables()
+    yield
+
+
+app=FastAPI(lifespan=life_span_handler)
+
+app.include_router(master_router)
+
+add_exception_handlers(app)
+
+# Scalar Document
+@app.get("/scalar")
+def get_scalar_docs():
+    return get_scalar_api_reference(
+        openapi_url= app.openapi_url,
+        title="Scalar API"
+    )
